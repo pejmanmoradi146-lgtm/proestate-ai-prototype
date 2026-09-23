@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ویرا | پلتفرم هوشمند املاک</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF6EE; --bg-alt:#F1E9D6; --card:#FFFFFF; --ink:#211C15; --ink-soft:#6B6152; --ink-faint:#A79C89;
+    --line:#E7DCC2; --turquoise:#0E7C7B; --turquoise-dark:#095F5E; --turquoise-tint:#E2F1EE;
+    --brick:#B4502A; --brick-dark:#8F3D1F; --brick-tint:#FBEBE1; --gold:#C08A26;
+    --success:#4E7C59; --success-tint:#E9F1E7; --danger:#B4432D;
+    --shadow: 0 1px 2px rgba(33,28,21,.04), 0 8px 24px -12px rgba(33,28,21,.18);
+    --radius: 14px; font-size:16px;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#181511; --bg-alt:#211D17; --card:#211D17; --ink:#F3EDE1; --ink-soft:#B7AC98; --ink-faint:#7E7461;
+      --line:#3A3327; --turquoise:#28B3AE; --turquoise-dark:#3ED0CA; --turquoise-tint:#152C2A;
+      --brick:#E08056; --brick-dark:#F0A17D; --brick-tint:#2E1E17; --gold:#E0AC4C;
+      --success:#7FB98C; --success-tint:#1B2A1E; --danger:#E0795F;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#181511; --bg-alt:#211D17; --card:#211D17; --ink:#F3EDE1; --ink-soft:#B7AC98; --ink-faint:#7E7461;
+    --line:#3A3327; --turquoise:#28B3AE; --turquoise-dark:#3ED0CA; --turquoise-tint:#152C2A;
+    --brick:#E08056; --brick-dark:#F0A17D; --brick-tint:#2E1E17; --gold:#E0AC4C;
+    --success:#7FB98C; --success-tint:#1B2A1E; --danger:#E0795F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--bg); color:var(--ink); font-family:'Vazirmatn', Tahoma, sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; }
+  ::selection{ background: var(--turquoise); color:#fff; }
+  a{ color:inherit; } button{ font-family:inherit; cursor:pointer; } input, textarea{ font-family:inherit; }
+
+  .app{ display:flex; min-height:100vh; }
+  .sidebar{ width:236px; flex:none; background:var(--bg-alt); border-inline-start:1px solid var(--line);
+    display:flex; flex-direction:column; padding:20px 14px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  .brand{ display:flex; align-items:center; gap:10px; padding:4px 8px 20px 8px; border-bottom:1px solid var(--line); margin-bottom:16px; }
+  .brand-mark{ width:38px;height:38px;border-radius:10px; background:linear-gradient(155deg, var(--turquoise) 0%, var(--turquoise-dark) 100%);
+    display:flex;align-items:center;justify-content:center; flex:none; }
+  .brand-mark svg{ width:20px;height:20px; }
+  .brand-text{ line-height:1.25; }
+  .brand-text .name{ font-weight:800; font-size:1.05rem; }
+  .brand-text .tag{ font-size:.66rem; color:var(--ink-faint); letter-spacing:.3px; font-family:Arial,sans-serif; }
+
+  nav.nav{ display:flex; flex-direction:column; gap:2px; }
+  .nav-item{ display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px; color:var(--ink-soft);
+    font-size:.85rem; font-weight:600; background:transparent; border:none; text-align:right; width:100%; transition:.15s; }
+  .nav-item svg{ width:17px;height:17px; flex:none; opacity:.8; }
+  .nav-item:hover{ background:var(--card); color:var(--ink); }
+  .nav-item.active{ background:var(--turquoise); color:#fff; }
+  .nav-item.active svg{ opacity:1; }
+
+  .sidebar-foot{ margin-top:auto; padding-top:14px; border-top:1px solid var(--line); }
+  .user-chip{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; }
+  .user-chip .av{ width:34px;height:34px;border-radius:50%; background:var(--brick-tint); color:var(--brick-dark);
+    display:flex;align-items:center;justify-content:center; font-weight:700; font-size:.85rem; flex:none; }
+  .user-chip .who{ line-height:1.2; }
+  .user-chip .who b{ display:block; font-size:.83rem; }
+  .user-chip .who span{ font-size:.72rem; color:var(--ink-faint); }
+
+  main.content{ flex:1; min-width:0; padding: 24px 32px 60px; }
+  .page{ display:none; animation: fadein .25s ease; }
+  .page.active{ display:block; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+  .page-head h1{ font-size:1.45rem; margin:0 0 4px; font-weight:800; }
+  .page-head p{ margin:0; color:var(--ink-soft); font-size:.88rem; }
+
+  .btn{ display:inline-flex; align-items:center; gap:8px; border-radius:10px; border:none; padding:10px 18px;
+    font-weight:700; font-size:.85rem; background:var(--turquoise); color:#fff; box-shadow: var(--shadow); transition:.12s; }
+  .btn:hover{ background:var(--turquoise-dark); }
+  .btn:active{ transform:scale(.97); }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); box-shadow:none; }
+  .btn.ghost:hover{ background:var(--card); }
+  .btn.brick{ background:var(--brick); } .btn.brick:hover{ background:var(--brick-dark); }
+  .btn.block{ width:100%; justify-content:center; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn:disabled:hover{ background:var(--turquoise); }
+  .btn.sm{ padding:7px 13px; font-size:.78rem; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+
+  /* stat cards */
+  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+  .stat-card{ padding:18px; display:flex; align-items:center; justify-content:space-between; }
+  .stat-card .num{ font-size:1.5rem; font-weight:800; }
+  .stat-card .lbl{ color:var(--ink-soft); font-size:.78rem; margin-top:2px; }
+  .stat-ic{ width:42px;height:42px;border-radius:11px; display:flex;align-items:center;justify-content:center; flex:none; }
+  .stat-ic svg{ width:19px; height:19px; }
+
+  .listing-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid var(--line); }
+  .listing-row:last-child{ border-bottom:none; }
+  .listing-thumb{ width:64px;height:64px;border-radius:10px;flex:none; background-size:cover; background-position:center; }
+  .listing-meta{ flex:1; min-width:0; }
+  .listing-meta .t{ font-weight:700; font-size:.92rem; margin-bottom:3px; }
+  .listing-meta .d{ font-size:.78rem; color:var(--ink-soft); }
+  .badge{ font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:999px; flex:none; }
+  .badge.active{ background:var(--success-tint); color:var(--success); }
+  .badge.pending{ background:#FCF1DC; color:var(--gold); }
+  .badge.sold{ background:var(--brick-tint); color:var(--brick-dark); }
+  .row-actions{ display:flex; gap:6px; flex:none; }
+  .icon-btn{ width:32px;height:32px;border-radius:8px;border:1px solid var(--line); background:transparent;
+    display:flex;align-items:center;justify-content:center; color:var(--ink-soft); }
+  .icon-btn:hover{ background:var(--bg-alt); }
+  .icon-btn svg{ width:15px;height:15px; }
+
+  .filter-tabs{ display:flex; gap:6px; padding:14px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .ftab{ border:1px solid var(--line); background:transparent; color:var(--ink-soft); padding:7px 14px; border-radius:9px; font-size:.8rem; font-weight:600; }
+  .ftab.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+
+  .two-col{ display:grid; grid-template-columns: 2fr 1fr; gap:16px; align-items:flex-start; }
+
+  .avatar-strip{ display:flex; gap:14px; margin:2px 0 22px; flex-wrap:wrap; }
+  .avatar-item{ text-align:center; cursor:pointer; background:none; border:none; padding:0; }
+  .avatar-ring{ width:56px;height:56px;border-radius:50%; display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem; border:2px solid var(--card); outline:2px solid var(--turquoise); }
+  .avatar-item .lbl{ font-size:.7rem; margin-top:6px; color:var(--ink-soft); font-weight:600; }
+
+  /* side panel (workspace right icon menu) */
+  .side-panel{ padding:10px; display:flex; flex-direction:column; gap:2px; }
+  .side-panel-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 11px;
+    border-radius:9px; font-size:.82rem; font-weight:600; color:var(--ink-soft); border:none; background:none; width:100%; text-align:right; }
+  .side-panel-item svg{ width:16px;height:16px; opacity:.85; }
+  .side-panel-item.active{ background:var(--turquoise-tint); color:var(--turquoise-dark); }
+  .side-panel-item:hover{ background:var(--bg-alt); }
+  .mini-badge{ background:var(--brick); color:#fff; font-size:.65rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-inline-start:auto; }
+
+  .seg-toggle{ display:inline-flex; background:var(--bg-alt); border:1px solid var(--line); border-radius:11px; padding:3px; gap:2px; }
+  .seg{ border:none; background:transparent; padding:8px 16px; border-radius:8px; font-size:.82rem; font-weight:700; color:var(--ink-soft); }
+  .seg.active{ background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+
+  /* ---------- IG-style profile ---------- */
+  .ig-banner{ background:linear-gradient(120deg, var(--turquoise-dark), var(--turquoise) 55%, var(--brick) 130%);
+    border-radius:18px; padding:26px 26px 22px; color:#fff; position:relative; overflow:hidden; margin-bottom:18px; }
+  .ig-avatar{ width:74px;height:74px;border-radius:50%; background:rgba(255,255,255,.2); border:3px solid #fff;
+    display:flex;align-items:center;justify-content:center; font-size:1.7rem; font-weight:800; position:absolute; top:22px; left:26px; }
+  .ig-info{ max-width:640px; }
+  .ig-name{ font-size:1.25rem; font-weight:800; display:flex; align-items:center; gap:7px; }
+  .ig-name .verify{ width:19px;height:19px; background:#fff; color:var(--turquoise-dark); border-radius:50%; font-size:.72rem; display:inline-flex;align-items:center;justify-content:center; }
+  .ig-loc{ font-size:.78rem; opacity:.9; margin:4px 0 10px; }
+  .ig-bio{ font-size:.85rem; line-height:1.9; opacity:.95; margin:0 0 16px; max-width:520px; }
+  .ig-stats{ display:flex; gap:22px; margin-bottom:14px; flex-wrap:wrap; }
+  .ig-stats div{ text-align:center; }
+  .ig-stats b{ display:block; font-size:1.05rem; }
+  .ig-stats span{ font-size:.7rem; opacity:.85; }
+  .ig-tags{ display:flex; gap:7px; flex-wrap:wrap; }
+  .ig-tags .tag-chip{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.35); color:#fff; }
+
+  /* ---------- search / home ---------- */
+  .hero{ border-radius:20px; background: linear-gradient(120deg, var(--turquoise-dark) 0%, var(--turquoise) 62%, #14958F 100%);
+    color:#fff; padding:32px 28px; position:relative; overflow:hidden; margin-bottom:22px; }
+  .hero svg.pattern{ position:absolute; inset:0; width:100%; height:100%; opacity:.16; }
+  .hero-inner{ position:relative; z-index:1; max-width:640px; }
+  .hero h1{ font-size:1.6rem; margin:0 0 8px; font-weight:800; }
+  .hero p{ margin:0 0 20px; opacity:.9; font-size:.9rem; }
+
+  .cat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .cat-card{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); border-radius:14px; padding:16px 14px;
+    text-align:center; color:#fff; }
+  .cat-card:hover{ background:rgba(255,255,255,.22); }
+  .cat-card .ic{ width:38px;height:38px;border-radius:10px;margin:0 auto 10px; background:rgba(255,255,255,.22); display:flex;align-items:center;justify-content:center; }
+  .cat-card svg{ width:18px;height:18px; }
+  .cat-card .t{ font-weight:700; font-size:.88rem; }
+  .cat-card .s{ font-size:.66rem; opacity:.85; margin-top:2px; }
+
+  .section-head{ display:flex; align-items:center; justify-content:space-between; margin:26px 0 12px; }
+  .section-head h2{ font-size:1rem; margin:0; font-weight:800; }
+
+  .explore-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .explore-item{ position:relative; aspect-ratio:1; border-radius:9px; overflow:hidden; background-size:cover; background-position:center; }
+  .explore-item.clickable{ cursor:pointer; outline:2px solid var(--turquoise); outline-offset:2px; }
+  .explore-badge{ position:absolute; bottom:7px; left:7px; background:rgba(15,12,8,.62); color:#fff; font-size:.66rem; font-weight:700;
+    padding:3px 8px; border-radius:999px; display:flex; align-items:center; gap:4px; }
+  .explore-badge svg{ width:11px;height:11px; }
+  .explore-tag{ position:absolute; top:7px; right:7px; background:var(--brick); color:#fff; font-size:.62rem; font-weight:700; padding:3px 8px; border-radius:999px; }
+
+  .search-bar{ display:flex; gap:10px; margin:18px 0 16px; flex-wrap:wrap; }
+  .search-input{ flex:1; min-width:200px; border:1px solid var(--line); background:var(--card); border-radius:11px; padding:12px 16px; font-size:.87rem; color:var(--ink); }
+  .search-input:focus{ outline:2px solid var(--turquoise); outline-offset:1px; }
+  .smart-panel{ display:none; padding:20px 22px; margin-bottom:4px; }
+  .smart-panel.show{ display:block; }
+  .smart-panel-head{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .smart-panel-ic{ width:38px;height:38px;border-radius:11px; background:var(--turquoise-tint); color:var(--turquoise-dark); display:flex;align-items:center;justify-content:center; font-size:1.1rem; flex:none; }
+  .sort-row{ display:flex; gap:8px; margin-bottom:14px; }
+  .sort-chip{ border:1px solid var(--line); background:var(--card); padding:6px 13px; border-radius:9px; font-size:.78rem; font-weight:600; color:var(--ink-soft); }
+  .sort-chip.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+
+  .prop-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .prop-card{ overflow:hidden; }
+  .prop-img{ height:140px; background-size:cover; background-position:center; position:relative; }
+  .prop-price{ position:absolute; bottom:10px; right:10px; background:rgba(20,16,10,.72); color:#fff; font-size:.76rem; font-weight:700; padding:5px 11px; border-radius:999px; }
+  .prop-body{ padding:13px 14px 15px; }
+  .prop-body .t{ font-weight:700; font-size:.87rem; margin-bottom:5px; }
+  .prop-body .m{ font-size:.75rem; color:var(--ink-soft); display:flex; justify-content:space-between; }
+
+  /* ---------- property detail ---------- */
+  .pd-cover{ height:320px; border-radius:14px 14px 0 0; position:relative; background-size:cover; background-position:center; }
+  .pd-star{ position:absolute; top:14px; left:14px; background:rgba(0,0,0,.55); color:#fff; padding:6px 13px; border-radius:999px; font-weight:700; font-size:.85rem; }
+  .pd-agent{ position:absolute; top:14px; right:14px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.94);
+    border-radius:999px; padding:5px 14px 5px 5px; box-shadow:var(--shadow); }
+  .pd-agent-photo{ width:36px;height:36px;border-radius:50%; background:var(--turquoise); color:#fff; display:flex;align-items:center;justify-content:center; font-weight:800; font-size:.85rem; flex:none; }
+  .pd-agent-name{ font-size:.76rem; font-weight:700; color:var(--ink); line-height:1.3; }
+  .pd-agent-name span{ display:block; font-weight:500; color:var(--ink-soft); font-size:.68rem; }
+  .pd-body{ padding:24px 26px 26px; }
+  .pd-body h2{ margin:0 0 6px; font-size:1.25rem; }
+  .pd-price{ color:var(--turquoise-dark); font-weight:800; font-size:1.15rem; margin-bottom:18px; }
+  .spec-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+  .spec-tile{ background:var(--bg-alt); border-radius:11px; padding:13px 8px; text-align:center; }
+  .spec-tile .v{ font-weight:800; font-size:.92rem; }
+  .spec-tile .l{ font-size:.68rem; color:var(--ink-soft); margin-top:3px; }
+  .ai-note{ background:var(--turquoise-tint); border:1px solid var(--turquoise); border-radius:12px; padding:14px 16px; font-size:.84rem; line-height:1.9; margin-bottom:20px; }
+  .pd-contact-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+
+  /* ---------- tools ---------- */
+  .tool-layout{ display:grid; grid-template-columns:1fr 260px; gap:16px; align-items:flex-start; }
+  .tool-card{ padding:24px; }
+  .tool-head{ display:flex; align-items:center; gap:14px; padding-bottom:18px; border-bottom:1px solid var(--line); margin-bottom:20px; }
+  .tool-head .ic{ width:44px;height:44px;border-radius:11px; background:var(--turquoise-tint); color:var(--turquoise-dark); display:flex;align-items:center;justify-content:center; flex:none; }
+  .tool-head h2{ margin:0; font-size:1.1rem; }
+  .tool-head p{ margin:2px 0 0; font-size:.8rem; color:var(--ink-soft); }
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
+  .field label{ display:block; font-size:.78rem; color:var(--ink-soft); margin-bottom:7px; font-weight:600; }
+  .field input{ width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 13px; font-size:.92rem; background:var(--bg); color:var(--ink); text-align:left; }
+  .field input:focus{ outline:2px solid var(--turquoise); outline-offset:1px; }
+  .field .hint{ font-size:.72rem; color:var(--ink-faint); margin-top:6px; }
+  .result-box{ border:1.5px dashed var(--turquoise); background:var(--turquoise-tint); border-radius:12px; padding:20px; text-align:center; }
+  .result-box .l1{ font-size:.78rem; color:var(--ink-soft); margin-bottom:6px; }
+  .result-box .v1{ font-size:1.5rem; font-weight:800; color:var(--turquoise-dark); }
+  .result-box .l2{ font-size:.75rem; color:var(--ink-soft); margin:12px 0 4px; }
+  .result-box .v2{ font-size:1.1rem; font-weight:700; color:var(--success); }
+  .side-tool-list{ display:flex; flex-direction:column; gap:6px; padding:10px; }
+  .side-tool{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 13px; border-radius:10px; font-size:.83rem; font-weight:600; border:1px solid transparent; }
+  .side-tool.active{ background:var(--turquoise); color:#fff; }
+  .side-tool.soon{ color:var(--ink-faint); }
+  .soon-tag{ font-size:.64rem; background:var(--bg-alt); color:var(--ink-faint); padding:2px 7px; border-radius:6px; font-weight:700; }
+
+  /* ---------- chat/advisor pages ---------- */
+  .advisor-card{ padding:26px 28px; margin-bottom:18px; }
+  .advisor-card h2{ margin:0 0 6px; font-size:1.15rem; display:flex; align-items:center; gap:9px; }
+  .advisor-card h2 svg{ width:20px;height:20px; color:var(--turquoise); }
+  .advisor-card > p{ margin:0 0 18px; color:var(--ink-soft); font-size:.85rem; line-height:1.9; }
+  .advisor-input{ width:100%; border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:.88rem; min-height:78px; resize:vertical; background:var(--bg); color:var(--ink); font-family:inherit; }
+  .advisor-input:focus{ outline:2px solid var(--turquoise); outline-offset:1px; }
+  .tag-row{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 18px; }
+  .tag-chip{ border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); padding:7px 13px; border-radius:999px; font-size:.78rem; font-weight:600; }
+  .tag-chip:hover{ border-color:var(--turquoise); color:var(--turquoise-dark); }
+
+  .answer-wrap{ display:none; } .answer-wrap.show{ display:block; }
+  .answer-badge{ display:inline-flex; align-items:center; gap:6px; background:var(--success-tint); color:var(--success); font-size:.75rem; font-weight:700; padding:5px 12px; border-radius:999px; margin-bottom:14px; }
+  .answer-text{ font-size:.88rem; line-height:2.05; color:var(--ink); }
+  .answer-text b{ color:var(--turquoise-dark); }
+  .answer-text ol{ padding-inline-start:20px; margin:10px 0; }
+  .answer-text li{ margin-bottom:6px; }
+
+  .charts-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .chart-card{ padding:18px 18px 8px; }
+  .chart-card h3{ margin:0 0 12px; font-size:.9rem; font-weight:700; }
+  .chart-holder{ position:relative; height:220px; }
+
+  .loading-dots{ display:inline-flex; gap:4px; }
+  .loading-dots span{ width:5px;height:5px;border-radius:50%; background:currentColor; animation: blink 1.1s infinite ease-in-out; }
+  .loading-dots span:nth-child(2){ animation-delay:.15s; } .loading-dots span:nth-child(3){ animation-delay:.3s; }
+  @keyframes blink{ 0%,80%,100%{opacity:.25;} 40%{opacity:1;} }
+
+  .an-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .an-grid .chart-card.full{ grid-column:1 / -1; }
+
+  /* ---------- new listing / AI assistant card ---------- */
+  .gen-card{ background:linear-gradient(120deg, var(--turquoise-tint), var(--bg-alt)); border:1px solid var(--turquoise); border-radius:14px; padding:18px 20px; margin-top:4px; }
+  .gen-card .gi{ height:150px; border-radius:10px; background:linear-gradient(135deg,#C7A17A,#9F8B72); margin-bottom:14px; display:flex;align-items:center;justify-content:center; color:#fff; font-size:.76rem; font-weight:700; }
+  .gen-card h4{ margin:0 0 6px; font-size:1rem; }
+  .gen-card p{ margin:0; font-size:.83rem; line-height:1.9; color:var(--ink-soft); }
+
+  .photo-drop{ border:1.5px dashed var(--line); border-radius:12px; padding:22px; text-align:center; cursor:pointer; color:var(--ink-soft); font-size:.82rem; background:var(--bg-alt); transition:.15s; }
+  .photo-drop:hover{ border-color:var(--turquoise); color:var(--turquoise-dark); }
+  .photo-preview-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .photo-thumb{ width:68px;height:68px;border-radius:9px; background-size:cover; background-position:center; border:1px solid var(--line); flex:none; }
+  .teaser-hint{ font-size:.72rem; color:var(--ink-faint); margin:6px 0 16px; line-height:1.7; }
+  .teaser-preview{ position:relative; border-radius:12px; overflow:hidden; height:180px; background-size:cover; background-position:center; background-color:var(--bg-alt); display:flex; align-items:center; justify-content:center; }
+  .teaser-play{ width:54px;height:54px;border-radius:50%; background:rgba(255,255,255,.92); display:flex;align-items:center;justify-content:center; box-shadow:var(--shadow); }
+  .teaser-dur{ position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,.6); color:#fff; font-size:.7rem; padding:3px 9px; border-radius:999px; }
+  .teaser-label{ position:absolute; top:10px; right:10px; background:var(--brick); color:#fff; font-size:.65rem; font-weight:700; padding:3px 9px; border-radius:999px; }
+
+  /* ---------- agent modal ---------- */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(20,16,10,.55); display:none; align-items:center; justify-content:center; z-index:100; padding:16px; }
+  .modal-overlay.show{ display:flex; }
+  .agent-modal{ background:var(--card); border-radius:20px; width:100%; max-width:460px; overflow:hidden; box-shadow:0 24px 60px -20px rgba(0,0,0,.45); max-height:90vh; display:flex; flex-direction:column; }
+  .agent-modal-header{ padding:22px 22px 26px; color:#fff; position:relative; }
+  .modal-close{ position:absolute; top:14px; left:14px; width:30px;height:30px;border-radius:50%; background:rgba(255,255,255,.25); border:none; color:#fff; font-size:1.1rem; line-height:1; }
+  .agent-avatar{ width:66px;height:66px;border-radius:50%; background:rgba(255,255,255,.25); border:3px solid #fff; display:flex;align-items:center;justify-content:center; font-size:1.8rem; position:absolute; top:18px; right:20px; }
+  .agent-title{ font-size:1.15rem; font-weight:800; margin-top:36px; }
+  .agent-sub{ font-size:.78rem; opacity:.9; margin-top:2px; }
+  .agent-body{ padding:20px 22px 22px; overflow-y:auto; }
+  .agent-msg{ background:var(--bg-alt); border-radius:14px; padding:14px 16px; font-size:.85rem; line-height:1.8; }
+  .agent-time{ display:block; font-size:.68rem; color:var(--ink-faint); margin-top:8px; }
+  .agent-input-row{ display:flex; gap:8px; align-items:center; margin-top:6px; }
+  .agent-input-row input{ flex:1; border:1px solid var(--line); border-radius:999px; padding:11px 16px; font-size:.84rem; background:var(--bg); color:var(--ink); }
+  .agent-input-row input:focus{ outline:2px solid var(--turquoise); }
+  .send-btn{ width:38px;height:38px;border-radius:50%; background:var(--turquoise); border:none; color:#fff; display:flex;align-items:center;justify-content:center; flex:none; }
+  .agent-reply{ display:none; background:var(--turquoise-tint); border-radius:14px; padding:14px 16px; font-size:.84rem; line-height:1.85; margin-top:12px; }
+  .agent-reply.show{ display:block; }
+
+  footer.foot{ text-align:center; padding:26px 0 6px; color:var(--ink-faint); font-size:.75rem; }
+
+  @media (max-width: 900px){
+    .stat-row{ grid-template-columns:repeat(2,1fr); }
+    .cat-grid{ grid-template-columns:repeat(2,1fr); }
+    .prop-grid{ grid-template-columns:repeat(2,1fr); }
+    .explore-grid{ grid-template-columns:repeat(3,1fr); }
+    .two-col{ grid-template-columns:1fr; }
+    .tool-layout{ grid-template-columns:1fr; }
+    .field-grid, .spec-grid{ grid-template-columns:1fr 1fr; }
+    .charts-row, .an-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 680px){
+    .app{ flex-direction:column; }
+    .sidebar{ position:fixed; inset:auto 0 0 0; height:auto; width:100%; flex-direction:row; align-items:center; padding:6px; border-inline-start:none; border-top:1px solid var(--line); z-index:40; overflow-x:auto; }
+    .brand{ display:none; }
+    nav.nav{ flex-direction:row; gap:1px; width:100%; }
+    .nav-item{ flex-direction:column; font-size:.58rem; gap:2px; padding:6px 5px; white-space:nowrap; }
+    .nav-item svg{ width:16px;height:16px; }
+    .sidebar-foot{ display:none; }
+    main.content{ padding:16px 14px 90px; }
+    .page-head{ flex-direction:column; align-items:flex-start; }
+    .stat-row{ grid-template-columns:1fr 1fr; }
+    .cat-grid{ grid-template-columns:1fr 1fr; }
+    .prop-grid{ grid-template-columns:1fr; }
+    .explore-grid{ grid-template-columns:repeat(2,1fr); }
+    .hero{ padding:22px 16px; } .hero h1{ font-size:1.25rem; }
+    .ig-avatar{ position:static; margin-bottom:12px; }
+    .spec-grid{ grid-template-columns:1fr 1fr; }
+    .agent-avatar{ position:static; margin-bottom:10px; }
+    .agent-title{ margin-top:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="brand-text"><div class="name">ویرا</div><div class="tag">PROESTATE AI</div></div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-page="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H17.5a1 1 0 0 0 1-1v-9"/></svg>
+        خانه
+      </button>
+      <button class="nav-item" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.8"/></svg>
+        داشبورد
+      </button>
+      <button class="nav-item" data-page="realestate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.35-4.35" stroke-linecap="round"/></svg>
+        املاک
+      </button>
+      <button class="nav-item" data-page="architecture">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+        معماری
+      </button>
+      <button class="nav-item" data-page="legal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        مشاور حقوقی
+      </button>
+      <button class="nav-item" data-page="invest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M21 19V3" stroke-linecap="round"/></svg>
+        مشاور سرمایه‌گذاری
+      </button>
+      <button class="nav-item" data-page="tools">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a3.5 3.5 0 0 1-4.6 4.6L5 16l2 2 5.1-5.1a3.5 3.5 0 0 1 4.6-4.6l-2.2 2.2-1.5-.4-.4-1.5 2.1-2.2z" stroke-linejoin="round"/></svg>
+        ابزارهای کاربردی
+      </button>
+      <button class="nav-item" data-page="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5.5 4 3L21 6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        تحلیل بازار
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="user-chip"><div class="av">م.ر</div><div class="who"><b>مهندس رضایی</b><span>مشاور املاک</span></div></div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ================= HOME / EXPLORE ================= -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <svg class="pattern" viewBox="0 0 400 200" preserveAspectRatio="none">
+          <defs><pattern id="girih" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="none" stroke="#fff" stroke-width="1"/>
+            <circle cx="20" cy="20" r="4" fill="none" stroke="#fff" stroke-width="1"/>
+          </pattern></defs>
+          <rect width="400" height="200" fill="url(#girih)"/>
+        </svg>
+        <div class="hero-inner">
+          <h1>کاوش در دنیای املاک</h1>
+          <p>جستجوی هوشمند ملک با تحلیل هوش مصنوعی و امتیازدهی کاربران</p>
+          <div class="cat-grid">
+            <button class="cat-card" onclick="showPage('realestate')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.5"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.5"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.5"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.5"/></svg></div>
+              <div class="t">املاک</div><div class="s">کاوش آگهی‌های برتر</div>
+            </button>
+            <button class="cat-card" onclick="showPage('legal')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg></div>
+              <div class="t">حقوقی</div><div class="s">مشاوره حقوقی تخصصی</div>
+            </button>
+            <button class="cat-card" onclick="showPage('architecture')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></div>
+              <div class="t">معماری</div><div class="s">طراحی پلان هوشمند</div>
+            </button>
+            <button class="cat-card" onclick="showPage('invest')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 19V9M10 19V5M16 19v-7M21 19V3"/></svg></div>
+              <div class="t">سرمایه‌گذاری</div><div class="s">مشاوره هوشمند مالی</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2>🔍 اکسپلور آگهی‌ها</h2></div>
+      <div class="explore-grid">
+        <div class="explore-item clickable" style="background-image:url(https://picsum.photos/seed/vira-kianpars/700/700)" onclick="showPage('property')">
+          <span class="explore-tag">کیانپارس</span>
+          <span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۲,۴۵۰</span>
+        </div>
+        <div class="explore-item clickable" style="background-image:url(https://picsum.photos/seed/vira-e2/700/700)" onclick="showPage('propertyowner')">
+          <span class="explore-tag" style="background:var(--turquoise-dark)">آگهی مالک</span>
+          <span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۹۸۰</span>
+        </div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e3/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۱,۲۱۰</span></div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e4/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۶۴۰</span></div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e5/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۱,۸۹۰</span></div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e6/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۳۲۰</span></div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e7/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۲,۰۵۰</span></div>
+        <div class="explore-item" style="background-image:url(https://picsum.photos/seed/vira-e8/700/700)"><span class="explore-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>۷۵۰</span></div>
+      </div>
+    </section>
+
+    <!-- ================= PROPERTY DETAIL ================= -->
+    <section class="page" id="page-property">
+      <button class="btn ghost sm" style="margin-bottom:16px;" onclick="showPage('home')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        بازگشت
+      </button>
+      <div class="card">
+        <div class="pd-cover" style="background-image:url(https://picsum.photos/seed/vira-kianpars-cover/1000/700)">
+          <span class="pd-star">⭐ ۴.۵</span>
+          <div class="pd-agent">
+            <div class="pd-agent-photo" style="background-image:url(https://i.pravatar.cc/100?img=53);background-size:cover;background-position:center;"></div>
+            <div class="pd-agent-name">آقای محمدی<span>مشاور املاک</span></div>
+          </div>
+        </div>
+        <div class="pd-body">
+          <h2>آپارتمان ۱۶۰ متری کیانپارس</h2>
+          <div class="pd-price">۳۰ میلیارد تومان</div>
+          <div class="spec-grid">
+            <div class="spec-tile"><div class="v">۱۶۰ متر</div><div class="l">متراژ</div></div>
+            <div class="spec-tile"><div class="v">تک‌واحدی</div><div class="l">نوع واحد</div></div>
+            <div class="spec-tile"><div class="v">طبقه ۳</div><div class="l">طبقه</div></div>
+            <div class="spec-tile"><div class="v">دارد</div><div class="l">آسانسور و پارکینگ</div></div>
+            <div class="spec-tile"><div class="v">۱۴۰۲</div><div class="l">سال ساخت</div></div>
+            <div class="spec-tile"><div class="v">فول</div><div class="l">مشاعات</div></div>
+            <div class="spec-tile"><div class="v">۳ خواب</div><div class="l">مستر</div></div>
+            <div class="spec-tile"><div class="v">۱۸۷.۵M</div><div class="l">قیمت هر متر</div></div>
+          </div>
+          <div class="ai-note">✨ بر اساس تحلیل هوش مصنوعی ویرا، این ملک با توجه به موقعیت، متراژ و امکانات، جزو ملک‌های <b>«به‌قیمت»</b> بازار قرار می‌گیرد — یعنی قیمت پیشنهادی متناسب با شرایط منطقه و ویژگی‌های ملک است، نه بالاتر و نه پایین‌تر از میانگین بازار.</div>
+          <div class="pd-contact-row">
+            <button class="btn brick" onclick="openAgentChat('mohammadi','property')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9"><path d="M3 5c0 9 7 16 16 16l2-4-5-3-2 2c-2.5-1.2-4.8-3.5-6-6l2-2-3-5-4 2z"/></svg>
+              ارتباط با مشاور
+            </button>
+            <button class="btn ghost" onclick="showVirtualTour('property')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="14" rx="2.5"/><path d="M8 21h8M12 18v3" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/></svg>
+              بازدید مجازی
+            </button>
+          </div>
+          <div class="answer-wrap" id="tourOut-property" style="margin-top:16px;"><div id="tourCard-property"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROPERTY DETAIL (OWNER LISTING) ================= -->
+    <section class="page" id="page-propertyowner">
+      <button class="btn ghost sm" style="margin-bottom:16px;" onclick="showPage('home')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        بازگشت
+      </button>
+      <div class="card">
+        <div class="pd-cover" style="background-image:url(https://picsum.photos/seed/vira-owner-cover/1000/700)">
+          <span class="pd-star" style="background:rgba(9,95,94,.75)">🔑 بدون واسطه</span>
+          <div class="pd-agent">
+            <div class="pd-agent-photo" style="background-image:url(https://i.pravatar.cc/100?img=12);background-size:cover;background-position:center;"></div>
+            <div class="pd-agent-name">آقای کریمی<span>مالک ملک</span></div>
+          </div>
+        </div>
+        <div class="pd-body">
+          <h2>آپارتمان ۹۵ متری کوی ملت</h2>
+          <div class="pd-price">۹.۵ میلیارد تومان</div>
+          <div class="spec-grid">
+            <div class="spec-tile"><div class="v">۹۵ متر</div><div class="l">متراژ</div></div>
+            <div class="spec-tile"><div class="v">مجتمعی</div><div class="l">نوع واحد</div></div>
+            <div class="spec-tile"><div class="v">طبقه ۲</div><div class="l">طبقه</div></div>
+            <div class="spec-tile"><div class="v">پارکینگ</div><div class="l">امکانات</div></div>
+            <div class="spec-tile"><div class="v">۱۳۹۸</div><div class="l">سال ساخت</div></div>
+            <div class="spec-tile"><div class="v">معمولی</div><div class="l">مشاعات</div></div>
+            <div class="spec-tile"><div class="v">۲ خواب</div><div class="l">تعداد خواب</div></div>
+            <div class="spec-tile"><div class="v">۱۰۰M</div><div class="l">قیمت هر متر</div></div>
+          </div>
+          <div class="ai-note">✨ این آگهی مستقیم توسط مالک ثبت شده (بدون واسطه). بر اساس تحلیل هوش مصنوعی ویرا، به همین دلیل قیمت این ملک حدود ۵٪ زیر میانگین ملک‌های مشابه با واسطه در همین منطقه قرار دارد.</div>
+          <div class="pd-contact-row">
+            <button class="btn brick" onclick="openAgentChat('karimi','propertyowner')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9"><path d="M3 5c0 9 7 16 16 16l2-4-5-3-2 2c-2.5-1.2-4.8-3.5-6-6l2-2-3-5-4 2z"/></svg>
+              تماس با مالک
+            </button>
+            <button class="btn ghost" onclick="showVirtualTour('propertyowner')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="14" rx="2.5"/><path d="M8 21h8M12 18v3" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/></svg>
+              بازدید مجازی
+            </button>
+          </div>
+          <div class="answer-wrap" id="tourOut-propertyowner" style="margin-top:16px;"><div id="tourCard-propertyowner"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= AGENT CHAT ================= -->
+    <section class="page" id="page-agentchat">
+      <button class="btn ghost sm" style="margin-bottom:16px;" onclick="showPage(chatReturnPage)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        بازگشت
+      </button>
+      <div class="card" style="overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);">
+          <div class="pd-agent-photo" id="chatAvatar" style="width:44px;height:44px;background-size:cover;background-position:center;"></div>
+          <div>
+            <div style="font-weight:800;font-size:.95rem;" id="chatName">آقای محمدی</div>
+            <div style="font-size:.75rem;color:var(--success);" id="chatStatus">آنلاین · مشاور این ملک</div>
+          </div>
+        </div>
+
+        <div id="chatThread" style="padding:20px 18px;display:flex;flex-direction:column;gap:12px;min-height:320px;max-height:420px;overflow-y:auto;"></div>
+
+        <div style="display:flex;gap:8px;padding:14px 18px;border-top:1px solid var(--line);">
+          <button class="send-btn" onclick="sendChat()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+          <input id="chatInput" placeholder="پیام خود را بنویسید..." style="flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 16px;font-size:.85rem;background:var(--bg);color:var(--ink);" onkeydown="if(event.key==='Enter')sendChat()">
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= REAL ESTATE SEARCH ================= -->
+    <section class="page" id="page-realestate">
+      <div class="page-head">
+        <div><h1>جستجوی املاک</h1><p>کاوش آگهی‌های برتر بر اساس منطقه، قیمت و امتیاز</p></div>
+        <button class="btn brick" onclick="showPage('individuallisting')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          ثبت آگهی توسط مالک
+        </button>
+      </div>
+      <div class="search-bar">
+        <button class="btn ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>فیلتر</button>
+        <button class="btn ghost" id="smartSearchBtn" style="border-color:var(--turquoise);color:var(--turquoise-dark);" onclick="toggleSmartSearch()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="3.4"/></svg>
+          جستجوی هوشمند
+        </button>
+        <input class="search-input" placeholder="جستجوی منطقه، محله، نوع ملک...">
+      </div>
+
+      <div class="card smart-panel" id="smartPanel">
+        <div class="smart-panel-head">
+          <div class="smart-panel-ic">✨</div>
+          <div>
+            <div style="font-weight:800;font-size:.92rem;">دستیار هوشمند جستجوی ملک</div>
+            <div style="font-size:.75rem;color:var(--ink-soft);">فقط کافیه بگی دنبال چه ملکی می‌گردی، من اون ملک رو واست پیدا می‌کنم</div>
+          </div>
+        </div>
+        <div class="smart-panel-body">
+          <textarea class="advisor-input" id="smartInput" style="min-height:60px" placeholder="مثلاً: چقدر بودجه داری، کدوم منطقه رو می‌خوای و هدفت از خرید یا اجاره چیه؟">من ۱۵ میلیارد سرمایه دارم، دنبال یه آپارتمان ۳ خواب توی منطقه کیانپارس می‌گردم و هدفم از خرید، سرمایه‌گذاری ملکیه</textarea>
+          <button class="btn" style="margin-top:12px;" onclick="runSmartSearch()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            پیدا کن
+          </button>
+
+          <div class="answer-wrap" id="smartAnswer">
+            <div style="height:1px;background:var(--line);margin:20px 0;"></div>
+            <span class="answer-badge">✓ ۳ گزینه مطابق با درخواست شما پیدا شد</span>
+            <div class="answer-text" style="margin-bottom:16px;">
+              بر اساس بودجه <b>۱۵ میلیارد تومان</b> شما، منطقه <b>کیانپارس</b> و نیاز به <b>۳ خواب</b>، این گزینه‌ها در بازه ۱۵ تا ۱۷ میلیارد تومان پیدا شدن:
+            </div>
+            <div class="prop-grid" id="smartResults">
+              <div class="card prop-card">
+                <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-smart1/700/500)"><span class="prop-price">۱۵.۵ میلیارد</span></div>
+                <div class="prop-body"><div class="t">آپارتمان ۱۴۰ متری کیانپارس</div><div class="m"><span>۳ خواب</span><span>⭐ ۴.۶</span></div></div>
+              </div>
+              <div class="card prop-card">
+                <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-smart2/700/500)"><span class="prop-price">۱۶.۲ میلیارد</span></div>
+                <div class="prop-body"><div class="t">آپارتمان ۱۵۵ متری کیانپارس</div><div class="m"><span>۳ خواب</span><span>⭐ ۴.۸</span></div></div>
+              </div>
+              <div class="card prop-card">
+                <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-smart3/700/500)"><span class="prop-price">۱۷ میلیارد</span></div>
+                <div class="prop-body"><div class="t">آپارتمان ۱۶۵ متری کیانپارس</div><div class="m"><span>۳ خواب</span><span>⭐ ۴.۵</span></div></div>
+              </div>
+            </div>
+
+            <div class="ai-note" style="margin-top:18px;">
+              💡 <b>تحلیل سرمایه‌گذاری:</b> با توجه به اینکه هدف شما سرمایه‌گذاریه، منطقه <b>مهرشهر اهواز</b> اخیراً روند رشد بهتری نسبت به کیانپارس داشته و می‌تونه گزینه‌های باارزش‌تری برای سرمایه‌گذاری داشته باشه. اگه بخوای، می‌تونم گزینه‌های مهرشهر رو هم نشونت بدم.
+              <div style="margin-top:10px;"><button class="btn ghost sm" style="border-color:var(--turquoise);color:var(--turquoise-dark);" onclick="showMehrshahrOptions()">بله، گزینه‌های مهرشهر رو نشون بده</button></div>
+            </div>
+
+            <div id="mehrshahrResults" style="display:none;margin-top:16px;">
+              <div class="prop-grid">
+                <div class="card prop-card">
+                  <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-mehr1/700/500)"><span class="prop-price">۱۴.۸ میلیارد</span></div>
+                  <div class="prop-body"><div class="t">آپارتمان ۱۵۰ متری مهرشهر</div><div class="m"><span>۳ خواب</span><span>⭐ ۴.۷</span></div></div>
+                </div>
+                <div class="card prop-card">
+                  <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-mehr2/700/500)"><span class="prop-price">۱۶.۵ میلیارد</span></div>
+                  <div class="prop-body"><div class="t">آپارتمان ۱۷۰ متری مهرشهر</div><div class="m"><span>۳ خواب</span><span>⭐ ۴.۶</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sort-row" style="margin-top:20px;">
+        <button class="sort-chip active">جدیدترین</button>
+        <button class="sort-chip">امتیاز بالا</button>
+        <button class="sort-chip">ارزان‌ترین</button>
+      </div>
+      <div class="prop-grid">
+        <div class="card prop-card" style="cursor:pointer" onclick="showPage('property')">
+          <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p1/700/500)"><span class="prop-price">۳۰ میلیارد</span></div>
+          <div class="prop-body"><div class="t">آپارتمان ۱۶۰ متری کیانپارس</div><div class="m"><span>۱۶۰ متر</span><span>⭐ ۴.۵</span></div></div>
+        </div>
+        <div class="card prop-card">
+          <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p2/700/500)"><span class="prop-price">۱۸ میلیارد</span></div>
+          <div class="prop-body"><div class="t">واحد ۹۰ متری شهرک راه‌آهن</div><div class="m"><span>۹۰ متر</span><span>⭐ ۴.۹</span></div></div>
+        </div>
+        <div class="card prop-card">
+          <div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p3/700/500)"><span class="prop-price">۳۱ میلیارد</span></div>
+          <div class="prop-body"><div class="t">آپارتمان ۸۵ متری زیتون</div><div class="m"><span>۸۵ متر</span><span>⭐ ۴.۷</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INDIVIDUAL OWNER LISTING ================= -->
+    <section class="page" id="page-individuallisting">
+      <button class="btn ghost sm" style="margin-bottom:16px;" onclick="showPage('realestate')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        بازگشت
+      </button>
+      <div class="card tool-card">
+        <div class="tool-head">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H17.5a1 1 0 0 0 1-1v-9"/></svg></div>
+          <div><h2>ثبت آگهی شخصی ملک</h2><p>ملک خودتان را بدون واسطه، برای فروش یا رهن و اجاره آگهی کنید</p></div>
+        </div>
+
+        <div class="seg-toggle" style="margin-bottom:22px;">
+          <button class="seg active" id="segSale" onclick="toggleListType('sale')">فروش</button>
+          <button class="seg" id="segRent" onclick="toggleListType('rent')">رهن و اجاره</button>
+        </div>
+
+        <div class="field-grid">
+          <div class="field"><label>عنوان ملک</label><input id="ilTitle" placeholder="مثلاً: آپارتمان ۱۱۰ متری کیان‌آباد" style="text-align:right"></div>
+          <div class="field"><label>منطقه</label><input id="ilArea" placeholder="مثلاً: کیان‌آباد، اهواز" style="text-align:right"></div>
+          <div class="field"><label>متراژ (متر)</label><input id="ilMeter" type="number" placeholder="110"></div>
+          <div class="field" id="ilSaleWrap"><label>قیمت کل (تومان)</label><input id="ilPrice" type="number" placeholder="8000000000"></div>
+          <div class="field" id="ilDepositWrap" style="display:none"><label>ودیعه (تومان)</label><input id="ilDeposit" type="number" placeholder="500000000"></div>
+          <div class="field" id="ilRentWrap" style="display:none"><label>اجاره ماهانه (تومان)</label><input id="ilRent" type="number" placeholder="15000000"></div>
+          <div class="field"><label>تعداد خواب</label><input id="ilRoom" type="number" placeholder="2"></div>
+        </div>
+
+        <div class="field" style="margin-bottom:18px;">
+          <label>توضیحات یا ویژگی خاص (اختیاری)</label>
+          <textarea class="advisor-input" id="ilDesc" style="min-height:60px" placeholder="مثلاً: بازسازی‌شده، نورگیر عالی، نزدیک مترو..."></textarea>
+        </div>
+
+        <div class="field" style="margin-bottom:18px;">
+          <label>تصاویر ملک</label>
+          <div class="photo-drop" onclick="document.getElementById('ilPhotos').click()">
+            <input type="file" id="ilPhotos" accept="image/*" multiple style="display:none" onchange="handlePhotos(this,'ilPhotoPreview')">
+            📷 برای افزودن عکس ملک کلیک کنید
+          </div>
+          <div class="photo-preview-row" id="ilPhotoPreview"></div>
+        </div>
+
+        <button class="btn ghost block" style="margin-bottom:4px;border-color:var(--gold);color:var(--gold)" onclick="runTeaser('ilPhotoPreview','ilTeaserOut','ilTeaserCard')">
+          🎬 ساخت تیزر
+        </button>
+        <div class="teaser-hint">این قابلیت به شما کمک می‌کند با هوش مصنوعی، از عکس‌های ملک خود یک تیزر جذاب برای نمایش بسازید.</div>
+        <div class="answer-wrap" id="ilTeaserOut" style="margin-bottom:18px;">
+          <div id="ilTeaserCard"></div>
+        </div>
+
+        <button class="btn ghost block" style="margin-bottom:16px;border-color:var(--turquoise);color:var(--turquoise-dark)" onclick="runIndAssistant()">
+          ✨ مشاوره و تولید آگهی با دستیار هوشمند
+        </button>
+
+        <div class="answer-wrap" id="ilAssistantOut">
+          <div class="gen-card">
+            <div class="gi">تصویر پیشنهادی ملک (نمونه)</div>
+            <h4 id="ilGenTitle">—</h4>
+            <p id="ilGenDesc">—</p>
+          </div>
+          <div class="ai-note" id="ilAdvice" style="margin-top:14px;"></div>
+        </div>
+
+        <div style="height:16px"></div>
+        <button class="btn block">انتشار آگهی</button>
+      </div>
+    </section>
+
+    <!-- ================= ARCHITECTURE ================= -->
+    <section class="page" id="page-architecture">
+      <div class="page-head"><div><h1>مشاور معماری هوشمند</h1><p>سوالات خود را درباره طراحی و بهینه‌سازی فضا بپرسید</p></div></div>
+      <div class="card advisor-card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>راهنما</h2>
+        <p>سوالات خود درباره طراحی پلان، بهینه‌سازی فضا، نورپردازی و بازسازی ملک را مطرح کنید. هوش مصنوعی بر اساس متراژ و کاربری ملک شما، پیشنهاد طراحی ارائه می‌دهد.</p>
+        <textarea class="advisor-input" id="archInput" placeholder="سوال خود را بنویسید...">بهترین چیدمان برای آپارتمان ۹۰ متری دو خوابه چیست؟</textarea>
+        <div class="tag-row">
+          <button class="tag-chip" onclick="fillArch('بهترین چیدمان برای آپارتمان ۹۰ متری دو خوابه چیست؟')">📐 چیدمان بهینه</button>
+          <button class="tag-chip" onclick="fillArch('پیشنهاد نورپردازی برای پذیرایی چیست؟')">💡 نورپردازی</button>
+          <button class="tag-chip" onclick="fillArch('برای بازسازی آشپزخانه چه نکاتی مهم است؟')">🛠 بازسازی</button>
+          <button class="tag-chip" onclick="fillArch('چطور فضای کوچک را بزرگ‌تر نشان دهیم؟')">📦 بهینه‌سازی فضا</button>
+        </div>
+        <button class="btn" onclick="runArch()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          دریافت پیشنهاد طراحی
+        </button>
+        <div class="answer-wrap" id="archAnswer">
+          <div style="height:1px;background:var(--line);margin:22px 0;"></div>
+          <span class="answer-badge">✓ پیشنهاد طراحی آماده شد</span>
+          <div class="answer-text">
+            برای آپارتمان ۹۰ متری دو خوابه، پیشنهاد چیدمان بهینه به شرح زیر است:
+            <ol>
+              <li><b>باز کردن فضای نشیمن و آشپزخانه:</b> حذف دیوار غیرباربر بین آشپزخانه و پذیرایی، حس فضای بازتر و نور طبیعی بیشتر ایجاد می‌کند.</li>
+              <li><b>اتاق خواب اصلی:</b> در دورترین نقطه از ورودی برای حریم خصوصی بیشتر، با کمد دیواری تا سقف برای بهینه‌سازی فضای ذخیره‌سازی.</li>
+              <li><b>نورپردازی:</b> ترکیب نور سرد (۴۰۰۰K) در آشپزخانه و نور گرم (۳۰۰۰K) در پذیرایی، به‌همراه نور غیرمستقیم روی سقف کاذب.</li>
+            </ol>
+            <b>پیشنهاد نهایی:</b> با توجه به متراژ، استفاده از مبلمان چندکاره و رنگ‌های روشن، فضا را تا ۱۵٪ بزرگ‌تر از واقعیت نشان می‌دهد.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="page" id="page-dashboard">
+      <div class="page-head">
+        <div><h1>داشبورد مشاور</h1><p>خوش آمدید، مهندس رضایی 👋</p></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="seg-toggle">
+            <button class="seg active" id="segWorkspace" onclick="toggleDash('workspace')">دفتر کار</button>
+            <button class="seg" id="segProfile" onclick="toggleDash('profile')">پروفایل عمومی</button>
+          </div>
+          <button class="btn" onclick="showPage('newlisting')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            آگهی جدید
+          </button>
+        </div>
+      </div>
+
+      <!-- workspace view -->
+      <div id="dash-workspace">
+        <div class="avatar-strip">
+          <button class="avatar-item" onclick="openAgent('avak')"><div class="avatar-ring" style="background:linear-gradient(135deg,#ec4899,#a855f7)">👼</div><div class="lbl">آواک</div></button>
+          <button class="avatar-item" onclick="openAgent('zarkan')"><div class="avatar-ring" style="background:linear-gradient(135deg,#f97316,#dc2626)">🦊</div><div class="lbl">زرکان</div></button>
+          <button class="avatar-item" onclick="openAgent('kavin')"><div class="avatar-ring" style="background:linear-gradient(135deg,#fb923c,#ea580c)">🐉</div><div class="lbl">کاوین</div></button>
+          <button class="avatar-item" onclick="openAgent('yarin')"><div class="avatar-ring" style="background:linear-gradient(135deg,#14b8a6,#0d9488)">🐰</div><div class="lbl">یارین</div></button>
+          <button class="avatar-item" onclick="openAgent('raymon')"><div class="avatar-ring" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">🐲</div><div class="lbl">رایمون</div></button>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="stat-row">
+              <div class="card stat-card"><div><div class="num">67</div><div class="lbl">تماس امروز</div></div>
+                <div class="stat-ic" style="background:var(--brick-tint);color:var(--brick-dark)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 5c0 9 7 16 16 16l2-4-5-3-2 2c-2.5-1.2-4.8-3.5-6-6l2-2-3-5-4 2z"/></svg></div>
+              </div>
+              <div class="card stat-card"><div><div class="num">845</div><div class="lbl">پسندیده‌ها</div></div>
+                <div class="stat-ic" style="background:var(--success-tint);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 9V5a2 2 0 0 0-2-2l-1 5-3 3v9h9.5a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 18.7 9H14z"/><path d="M6 21H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h2v10z"/></svg></div>
+              </div>
+              <div class="card stat-card"><div><div class="num">۱۲.۴K</div><div class="lbl">بازدید ماه</div></div>
+                <div class="stat-ic" style="background:#FCF1DC;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              </div>
+              <div class="card stat-card"><div><div class="num">128</div><div class="lbl">آگهی فعال</div></div>
+                <div class="stat-ic" style="background:var(--turquoise-tint);color:var(--turquoise-dark)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H17.5a1 1 0 0 0 1-1v-9"/></svg></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="filter-tabs">
+                <button class="ftab active">همه</button><button class="ftab">فعال</button><button class="ftab">در انتظار</button><button class="ftab">فروخته‌شده</button>
+              </div>
+              <div class="listing-row">
+                <div class="row-actions"><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/></svg></button></div>
+                <span class="badge active">فعال</span>
+                <div class="listing-meta"><div class="t">آپارتمان کیانپارس، برج نگین</div><div class="d">۱۶۰ متر · ۳۰ میلیارد</div></div>
+                <div class="listing-thumb" style="background-image:url(https://picsum.photos/seed/vira-t1/200/200)"></div>
+              </div>
+              <div class="listing-row">
+                <div class="row-actions"><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/></svg></button></div>
+                <span class="badge active">فعال</span>
+                <div class="listing-meta"><div class="t">پنت‌هاوس زیتون کارمندی</div><div class="d">۲۲۰ متر · ۴۵ میلیارد</div></div>
+                <div class="listing-thumb" style="background-image:url(https://picsum.photos/seed/vira-t2/200/200)"></div>
+              </div>
+              <div class="listing-row">
+                <div class="row-actions"><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/></svg></button></div>
+                <span class="badge pending">در انتظار</span>
+                <div class="listing-meta"><div class="t">واحد تجاری امانیه</div><div class="d">۱۲۰ متر · ۱۵ میلیارد</div></div>
+                <div class="listing-thumb" style="background-image:url(https://picsum.photos/seed/vira-t3/200/200)"></div>
+              </div>
+              <div class="listing-row">
+                <div class="row-actions"><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/></svg></button></div>
+                <span class="badge sold">فروخته شده</span>
+                <div class="listing-meta"><div class="t">آپارتمان نادری</div><div class="d">۱۸۰ متر · ۳۸ میلیارد</div></div>
+                <div class="listing-thumb" style="background-image:url(https://picsum.photos/seed/vira-t4/200/200)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card side-panel">
+            <button class="side-panel-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.8"/></svg>داشبورد</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H17.5a1 1 0 0 0 1-1v-9"/></svg>آگهی‌های من</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="12" r="3.2"/></svg>استوری‌ها</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H7l-3 3V5z"/></svg>پیام‌ها<span class="mini-badge">۵</span></button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.6 5.6 6.2.6-4.6 4.2 1.3 6-5.5-3.2-5.5 3.2 1.3-6-4.6-4.2 6.2-.6z"/></svg>امتیازات</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5.5 4 3L21 6"/><path d="M15 6h6v6"/></svg>آمار بازدید</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>مالی</button>
+            <button class="side-panel-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V19a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10a1.7 1.7 0 0 0 1.55 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.55 1z"/></svg>تنظیمات</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ig profile view -->
+      <div id="dash-profile" style="display:none;">
+        <div class="ig-banner">
+          <div class="ig-avatar" style="background-image:url(https://i.pravatar.cc/150?img=53);background-size:cover;background-position:center;"></div>
+          <div class="ig-info">
+            <div class="ig-name">مهندس علی رضایی <span class="verify">✔</span></div>
+            <div class="ig-loc">📍 تهران، منطقه ۱ - ولنجک</div>
+            <p class="ig-bio">بیش از ۱۲ سال تجربه در بازار مسکن شمال تهران. متخصص در املاک لوکس و سرمایه‌گذاری‌های کلان. عضو رسمی اتحادیه مشاوران املاک با کد رهگیری ۲۴۵۶۷.</p>
+            <div class="ig-stats">
+              <div><b>۲.۳K</b><span>دنبال‌کننده</span></div>
+              <div><b>۸۴۵</b><span>معامله موفق</span></div>
+              <div><b>۱۲۸</b><span>آگهی فعال</span></div>
+              <div><b>⭐ ۴.۸</b><span>امتیاز کل</span></div>
+            </div>
+            <div class="ig-tags">
+              <span class="tag-chip">📈 تحلیلگر بازار</span>
+              <span class="tag-chip">💎 متخصص لوکس</span>
+              <span class="tag-chip">⚡ پاسخ سریع</span>
+              <span class="tag-chip">🛡 کد رهگیری معتبر</span>
+              <span class="tag-chip">💡 مشاور برتر ۱۴۰۳</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:18px 20px;margin-bottom:8px;">
+          <h3 style="margin:0 0 14px;font-size:.92rem;">استوری‌ها</h3>
+          <div class="avatar-strip" style="margin-bottom:0;">
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">ویلا</div><div class="lbl">ویلا شمال</div></div>
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">🏗</div><div class="lbl">مشارکت در ساخت</div></div>
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">💫</div><div class="lbl">فرصت طلایی</div></div>
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">🎥</div><div class="lbl">بازدید مجازی</div></div>
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">📊</div><div class="lbl">تحلیل بازار</div></div>
+            <div class="avatar-item"><div class="avatar-ring" style="background:var(--bg-alt);color:var(--ink-soft);font-size:.9rem">🏠</div><div class="lbl">پنت‌هاوس جدید</div></div>
+          </div>
+        </div>
+
+        <div class="section-head"><h2>آگهی‌های مشاور</h2></div>
+        <div class="prop-grid">
+          <div class="card prop-card"><div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p4/700/500)"><span class="prop-price">۳۰ میلیارد</span></div><div class="prop-body"><div class="t">آپارتمان ۱۶۰ متری کیانپارس</div><div class="m"><span>۱۶۰ متر</span><span>⭐ ۴.۵</span></div></div></div>
+          <div class="card prop-card"><div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p5/700/500)"><span class="prop-price">۴۵ میلیارد</span></div><div class="prop-body"><div class="t">پنت‌هاوس فرمانیه</div><div class="m"><span>۲۲۰ متر</span><span>⭐ ۴.۹</span></div></div></div>
+          <div class="card prop-card"><div class="prop-img" style="background-image:url(https://picsum.photos/seed/vira-p6/700/500)"><span class="prop-price">۱۵ میلیارد</span></div><div class="prop-body"><div class="t">واحد تجاری ونک</div><div class="m"><span>۱۲۰ متر</span><span>⭐ ۴.۷</span></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= NEW LISTING ================= -->
+    <section class="page" id="page-newlisting">
+      <button class="btn ghost sm" style="margin-bottom:16px;" onclick="showPage('dashboard')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        بازگشت
+      </button>
+      <div class="card tool-card">
+        <div class="tool-head">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 5v14M5 12h14"/></svg></div>
+          <div><h2>ثبت آگهی جدید</h2><p>مشخصات ملک را وارد کنید یا از دستیار هوشمند برای تکمیل خودکار استفاده کنید</p></div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field"><label>عنوان ملک</label><input id="nlTitle" placeholder="مثلاً: آپارتمان ۱۲۰ متری کیانپارس" style="text-align:right"></div>
+          <div class="field"><label>منطقه</label><input id="nlArea" placeholder="مثلاً: کیانپارس، اهواز" style="text-align:right"></div>
+          <div class="field"><label>متراژ (متر)</label><input id="nlMeter" type="number" placeholder="120"></div>
+          <div class="field"><label>قیمت (تومان)</label><input id="nlPrice" type="number" placeholder="15000000000"></div>
+          <div class="field"><label>تعداد خواب</label><input id="nlRoom" type="number" placeholder="2"></div>
+          <div class="field"><label>سال ساخت</label><input id="nlYear" type="number" placeholder="1401"></div>
+        </div>
+
+        <div class="field" style="margin-bottom:18px;">
+          <label>تصاویر ملک</label>
+          <div class="photo-drop" onclick="document.getElementById('nlPhotos').click()">
+            <input type="file" id="nlPhotos" accept="image/*" multiple style="display:none" onchange="handlePhotos(this,'nlPhotoPreview')">
+            📷 برای افزودن عکس ملک کلیک کنید
+          </div>
+          <div class="photo-preview-row" id="nlPhotoPreview"></div>
+        </div>
+
+        <button class="btn ghost block" style="margin-bottom:4px;border-color:var(--gold);color:var(--gold)" onclick="runTeaser('nlPhotoPreview','nlTeaserOut','nlTeaserCard')">
+          🎬 ساخت تیزر
+        </button>
+        <div class="teaser-hint">این قابلیت به شما کمک می‌کند با هوش مصنوعی، از عکس‌های ملک خود یک تیزر جذاب برای نمایش بسازید.</div>
+        <div class="answer-wrap" id="nlTeaserOut" style="margin-bottom:18px;">
+          <div id="nlTeaserCard"></div>
+        </div>
+
+        <button class="btn ghost block" style="margin-bottom:16px;border-color:var(--turquoise);color:var(--turquoise-dark)" onclick="runAssistant()">
+          ✨ تکمیل با دستیار هوشمند
+        </button>
+
+        <div class="answer-wrap" id="assistantOut">
+          <div class="gen-card">
+            <div class="gi">تصویر پیشنهادی ملک (نمونه)</div>
+            <h4 id="genTitle">—</h4>
+            <p id="genDesc">—</p>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+        <button class="btn block">انتشار آگهی</button>
+      </div>
+    </section>
+
+    <!-- ================= LEGAL ADVISOR ================= -->
+    <section class="page" id="page-legal">
+      <div class="page-head"><div><h1>مشاور حقوقی هوشمند</h1><p>سوالات حقوقی خود را در زمینه املاک و مستغلات بپرسید</p></div></div>
+      <div class="card advisor-card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>راهنما</h2>
+        <p>سوالات حقوقی خود در زمینه معاملات املاک، قراردادها، اجاره‌نامه‌ها، مشارکت در ساخت، کد رهگیری، کمیسیون مشاوران و سایر مسائل حقوقی مربوط به مسکن را مطرح کنید.</p>
+        <textarea class="advisor-input" id="legalInput" placeholder="سوال حقوقی خود را بنویسید...">نکات مهم قرارداد مشارکت در ساخت</textarea>
+        <div class="tag-row">
+          <button class="tag-chip" onclick="fillLegal('مالیات ملک چطور محاسبه می‌شود؟')">🧾 مالیات ملک</button>
+          <button class="tag-chip" onclick="fillLegal('کد رهگیری چیست و چرا الزامی است؟')">📄 کد رهگیری</button>
+          <button class="tag-chip" onclick="fillLegal('شرایط فسخ اجاره چیست؟')">🔑 فسخ اجاره</button>
+          <button class="tag-chip" onclick="fillLegal('نکات مهم مبایعه‌نامه چیست؟')">📝 مبایعه‌نامه</button>
+          <button class="tag-chip" onclick="fillLegal('نکات مهم قرارداد مشارکت در ساخت')">🏗 مشارکت در ساخت</button>
+        </div>
+        <button class="btn" onclick="runLegal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          دریافت پاسخ حقوقی
+        </button>
+        <div class="answer-wrap" id="legalAnswer">
+          <div style="height:1px;background:var(--line);margin:22px 0;"></div>
+          <span class="answer-badge">✓ تحلیل حقوقی آماده شد</span>
+          <div class="answer-text">
+            بر اساس قوانین جاری، قرارداد مشارکت در ساخت باید به‌صورت شفاف موارد زیر را پوشش دهد:
+            <ol>
+              <li><b>سهم‌الشرکه طرفین:</b> درصد دقیق سهم مالک زمین و سازنده از متراژ نهایی، به‌همراه نحوه تسویه در صورت اختلاف متراژ.</li>
+              <li><b>زمان‌بندی اجرا:</b> مهلت شروع و پایان عملیات ساخت با جریمه تأخیر مشخص برای هر روز تأخیر.</li>
+              <li><b>مشخصات فنی و متریال:</b> لیست دقیق متریال مورد استفاده، برند و کیفیت مصالح، به‌عنوان پیوست قرارداد.</li>
+              <li><b>شرایط فسخ و حل اختلاف:</b> تعیین مرجع داوری (داوری یا مراجع قضایی) و داور مرضی‌الطرفین با تخصص در امور ملکی.</li>
+            </ol>
+            <b>توصیه نهایی:</b> ثبت قرارداد در سامانه کد رهگیری و تنظیم آن توسط وکیل متخصص، الزامی و توصیه‌شده است.
+            <div style="margin-top:14px;font-size:.72rem;color:var(--ink-faint);">⚠️ این پاسخ صرفاً جنبه راهنمایی عمومی دارد و جایگزین مشاوره حقوقی تخصصی نیست.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INVESTMENT ADVISOR ================= -->
+    <section class="page" id="page-invest">
+      <div class="page-head"><div><h1>مشاور سرمایه‌گذاری هوشمند</h1><p>سوال خود را درباره سرمایه‌گذاری در بازار مسکن بپرسید</p></div></div>
+      <div class="card advisor-card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 19V9M10 19V5M16 19v-7M21 19V3"/></svg>راهنما</h2>
+        <p>سوال خود را درباره سرمایه‌گذاری در بازار مسکن بپرسید. هوش مصنوعی با تحلیل هزاران آگهی و داده بازار، بهترین پیشنهادات را همراه با نمودارهای تحلیلی به شما ارائه می‌دهد.</p>
+        <textarea class="advisor-input" id="investInput" placeholder="سوال خود را بنویسید...">با ۵ میلیارد تومان کجا سرمایه‌گذاری کنم؟</textarea>
+        <div class="tag-row">
+          <button class="tag-chip" onclick="fillInvest('گزینه‌های کم‌ریسک برای سرمایه‌گذاری کدامند؟')">🛡 کم‌ریسک</button>
+          <button class="tag-chip" onclick="fillInvest('بهترین منطقه برای پیش‌خرید کجاست؟')">📈 پیش‌خرید</button>
+          <button class="tag-chip" onclick="fillInvest('بهترین گزینه برای اجاره بلندمدت چیست؟')">💰 اجاره بلندمدت</button>
+          <button class="tag-chip" onclick="fillInvest('با ۵ میلیارد تومان کجا سرمایه‌گذاری کنم؟')">⚡ بودجه ۵ میلیارد</button>
+        </div>
+        <button class="btn" onclick="runInvest()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          دریافت پاسخ هوشمند
+        </button>
+        <div class="answer-wrap" id="investAnswer">
+          <div style="height:1px;background:var(--line);margin:22px 0;"></div>
+          <span class="answer-badge">✓ تحلیل کامل شد · بر اساس ۱۲,۴۵۸ آگهی فعال</span>
+          <div class="answer-text">
+            با توجه به بودجه <b>۵ میلیارد تومان</b> و تحلیل جامع بازار مسکن تهران در تیر ۱۴۰۵، بهترین گزینه‌های سرمایه‌گذاری به شرح زیر است:
+            <ol>
+              <li><b>منطقه ۲۲ (چیتگر و دریاچه):</b> رشد ۳۲٪ در یک سال گذشته، بالاترین پتانسیل رشد را دارد. میانگین قیمت آپارتمان ۸۰ متری در این منطقه حدود ۴.۸ میلیارد تومان است.</li>
+              <li><b>منطقه ۵ (پونک و شهران):</b> گزینه‌ای متعادل با رشد ۲۴٪ و ریسک کمتر، مناسب برای سرمایه‌گذاری میان‌مدت با بازدهی اجاره قابل قبول.</li>
+              <li><b>منطقه ۴ (تهرانپارس):</b> برای سرمایه‌گذاری بلندمدت و کم‌ریسک، با رشد ۱۸٪ و تقاضای بالای اجاره، گزینه مناسبی است.</li>
+            </ol>
+            <b>پیشنهاد نهایی هوش مصنوعی:</b> با توجه به پروفایل ریسک شما، ۶۰٪ بودجه در منطقه ۲۲ و ۴۰٪ در منطقه ۵ سرمایه‌گذاری شود تا تعادل مناسب بین رشد و ریسک ایجاد شود.
+          </div>
+          <div class="charts-row">
+            <div class="card chart-card"><h3>توزیع بودجه پیشنهادی</h3><div class="chart-holder"><div id="donutChart" style="width:100%;height:100%"></div></div></div>
+            <div class="card chart-card"><h3>روند قیمت مسکن تهران (میلیارد تومان)</h3><div class="chart-holder"><div id="trendChart" style="width:100%;height:100%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TOOLS ================= -->
+    <section class="page" id="page-tools">
+      <div class="page-head"><div><h1>ابزارهای کاربردی</h1><p>مجموعه‌ای از ابزارهای محاسباتی برای معاملات املاک</p></div></div>
+      <div class="tool-layout">
+        <div class="card tool-card">
+          <div class="tool-head">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M16 15h0"/></svg></div>
+            <div><h2>محاسبه کمیسیون مشاور املاک</h2><p>محاسبه سهم کمیسیون خریدار و فروشنده بر اساس قیمت ملک</p></div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><label>درصد کمیسیون (٪)</label><input type="number" id="commPct" value="0.25" step="0.05"><div class="hint">طبق تعرفه اتحادیه: ۰.۲۵٪ از هر طرف</div></div>
+            <div class="field"><label>قیمت کل ملک (تومان)</label><input type="number" id="commPrice" value="5000000000" step="1000000"></div>
+          </div>
+          <button class="btn" style="margin-bottom:20px;" onclick="calcCommission()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h0M8 16h2"/></svg>محاسبه
+          </button>
+          <div class="result-box">
+            <div class="l1">کمیسیون هر طرف (خریدار/فروشنده)</div><div class="v1" id="commEach">۱۲,۵۰۰,۰۰۰ تومان</div>
+            <div class="l2">مجموع کمیسیون مشاور</div><div class="v2" id="commTotal">۲۵,۰۰۰,۰۰۰ تومان</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="side-tool-list">
+            <div class="side-tool active">محاسبه کمیسیون <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/></svg></div>
+            <div class="side-tool soon">محاسبه اقساط وام <span class="soon-tag">به‌زودی</span></div>
+            <div class="side-tool soon">قیمت هر متر مربع <span class="soon-tag">به‌زودی</span></div>
+            <div class="side-tool soon">تبدیل واحد متراژ <span class="soon-tag">به‌زودی</span></div>
+            <div class="side-tool soon">محاسبه مالیات <span class="soon-tag">به‌زودی</span></div>
+            <div class="side-tool soon">تبدیل رهن و اجاره <span class="soon-tag">به‌زودی</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ANALYTICS ================= -->
+    <section class="page" id="page-analytics">
+      <div class="page-head"><div><h1>تحلیل بازار</h1><p>نمای کلی از روند بازار مسکن بر اساس داده‌های به‌روز</p></div></div>
+
+      <div class="card advisor-card">
+        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 17l5-5.5 4 3L21 6"/><path d="M15 6h6v6"/></svg>پرسش از تحلیلگر بازار</h2>
+        <p>درباره آینده یک منطقه یا روند قیمت مسکن سوال بپرسید تا هوش مصنوعی بر پایه روند داده‌ها تحلیل کند.</p>
+        <textarea class="advisor-input" id="analyticsInput" placeholder="سوال خود را بنویسید...">آینده بازار ملک منطقه مهرشهر اهواز چطور میشه؟</textarea>
+        <button class="btn" style="margin-top:16px;" onclick="runAnalyticsQ()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          دریافت تحلیل
+        </button>
+        <div class="answer-wrap" id="analyticsAnswer">
+          <div style="height:1px;background:var(--line);margin:22px 0;"></div>
+          <span class="answer-badge">✓ تحلیل منطقه‌ای آماده شد</span>
+          <div class="answer-text">
+            منطقه <b>مهرشهر اهواز</b> در سال‌های اخیر روند رشد قیمتی پایداری را تجربه کرده و با توجه به توسعه زیرساخت‌ها، بهبود دسترسی و افزایش تقاضای مسکن خانوادگی، در حال حاضر جزو <b>مناطق رو‌به‌رشد</b> شهر اهواز محسوب می‌شود.
+            <ol>
+              <li><b>روند قیمت:</b> شاخص قیمت این منطقه طی ۵ سال گذشته رشد پیوسته‌ای داشته، بدون افت‌های شدید فصلی.</li>
+              <li><b>تقاضا:</b> نزدیکی به مراکز خدماتی و آموزشی، تقاضای اجاره و خرید را در این منطقه بالا نگه داشته است.</li>
+              <li><b>چشم‌انداز:</b> با ادامه توسعه شهری در این محدوده، پیش‌بینی می‌شود روند رشد قیمت در میان‌مدت ادامه‌دار باشد.</li>
+            </ol>
+            <b>جمع‌بندی:</b> مهرشهر با توجه به روند رو‌به‌رشد و ریسک نسبتاً پایین، گزینه مناسبی برای سرمایه‌گذاری میان‌مدت تا بلندمدت به‌شمار می‌رود.
+          </div>
+          <div class="chart-card card" style="margin-top:16px;padding:18px 18px 8px;">
+            <h3>روند نمادین رشد قیمت مسکن — مهرشهر اهواز</h3>
+            <div class="chart-holder"><div id="mehrshahrChart" style="width:100%;height:100%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="an-grid">
+        <div class="card chart-card full"><h3>مقایسه رشد مناطق پیشنهادی (درصد)</h3><div class="chart-holder" style="height:260px;"><div id="compareChart" style="width:100%;height:100%"></div></div></div>
+        <div class="card chart-card"><h3>حجم معاملات منطقه ۲۲</h3><div class="chart-holder"><div id="volumeChart" style="width:100%;height:100%"></div></div></div>
+        <div class="card chart-card"><h3>میانگین قیمت در منطقه ۲۲ (میلیون تومان/متر)</h3><div class="chart-holder"><div id="priceChart" style="width:100%;height:100%"></div></div></div>
+      </div>
+    </section>
+
+    <footer class="foot">پروتوتایپ داخلی ویرا (Proestate AI) — تمامی داده‌ها نمایشی هستند</footer>
+  </main>
+</div>
+
+<!-- ================= AI AGENT MODAL ================= -->
+<div class="modal-overlay" id="agentModal" onclick="if(event.target===this)closeAgent()">
+  <div class="agent-modal">
+    <div class="agent-modal-header" id="agentHeader">
+      <button class="modal-close" onclick="closeAgent()">×</button>
+      <div class="agent-avatar" id="agentAvatar"></div>
+      <div class="agent-title" id="agentName"></div>
+      <div class="agent-sub" id="agentRole"></div>
+    </div>
+    <div class="agent-body">
+      <div class="agent-msg"><div id="agentGreet"></div><span class="agent-time">الان</span></div>
+      <div class="tag-row" id="agentChips"></div>
+      <div class="agent-input-row">
+        <button class="send-btn" onclick="sendAgent()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+        <input id="agentInput" placeholder="سوال خود را بپرسید...">
+      </div>
+      <div class="agent-reply" id="agentReply"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- page navigation ----------
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    const nav = document.querySelector('.nav-item[data-page="'+id+'"]');
+    if(nav){
+      document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+      nav.classList.add('active');
+    } else {
+      document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    }
+    window.scrollTo({top:0, behavior:'instant'});
+    if(id==='analytics') buildAnalyticsCharts();
+  }
+  document.querySelectorAll('.nav-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>showPage(btn.dataset.page));
+  });
+
+  // ---------- dashboard tab toggle ----------
+  function toggleDash(which){
+    document.getElementById('dash-workspace').style.display = which==='workspace' ? '' : 'none';
+    document.getElementById('dash-profile').style.display = which==='profile' ? '' : 'none';
+    document.getElementById('segWorkspace').classList.toggle('active', which==='workspace');
+    document.getElementById('segProfile').classList.toggle('active', which==='profile');
+  }
+
+  // ---------- commission calculator ----------
+  function faNum(n){ return Math.round(n).toLocaleString('fa-IR'); }
+  function calcCommission(){
+    const pct = parseFloat(document.getElementById('commPct').value) || 0;
+    const price = parseFloat(document.getElementById('commPrice').value) || 0;
+    const each = price * (pct/100);
+    document.getElementById('commEach').textContent = faNum(each) + ' تومان';
+    document.getElementById('commTotal').textContent = faNum(each*2) + ' تومان';
+  }
+  calcCommission();
+
+  // ---------- generic advisor loading helper ----------
+  function withLoading(btn, cb, ms){
+    const original = btn.innerHTML;
+    btn.innerHTML = 'در حال تحلیل <span class="loading-dots"><span></span><span></span><span></span></span>';
+    btn.disabled = true;
+    setTimeout(()=>{ btn.innerHTML = original; btn.disabled = false; cb(); }, ms||900);
+  }
+
+  // ---------- legal ----------
+  function fillLegal(q){ document.getElementById('legalInput').value = q; }
+  function runLegal(){
+    withLoading(event.target.closest('button'), ()=>{
+      document.getElementById('legalAnswer').classList.add('show');
+      document.getElementById('legalAnswer').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  }
+
+  // ---------- architecture ----------
+  function fillArch(q){ document.getElementById('archInput').value = q; }
+  function runArch(){
+    withLoading(event.target.closest('button'), ()=>{
+      document.getElementById('archAnswer').classList.add('show');
+      document.getElementById('archAnswer').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  }
+
+  // ---------- investment ----------
+  function fillInvest(q){ document.getElementById('investInput').value = q; }
+  let chartsBuilt = false;
+  function runInvest(){
+    withLoading(event.target.closest('button'), ()=>{
+      document.getElementById('investAnswer').classList.add('show');
+      document.getElementById('investAnswer').scrollIntoView({behavior:'smooth', block:'nearest'});
+      if(!chartsBuilt){
+        chartsBuilt = true;
+        svgDonut('donutChart', [
+          {label:'منطقه ۲۲ (چیتگر)', value:60, color:cssVar('--turquoise')},
+          {label:'منطقه ۵ (پونک)', value:40, color:cssVar('--brick')}
+        ]);
+        svgLineChart('trendChart', ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'],
+          [6.0,6.3,6.6,6.9,7.4,7.6,7.9,8.1,8.4,8.6,8.9,9.1], {color:cssVar('--turquoise'), fill:cssVar('--turquoise-tint'), skipLabels:true});
+      }
+    });
+  }
+
+  // ---------- new listing assistant ----------
+  function runAssistant(){
+    const btn = event.target.closest('button');
+    withLoading(btn, ()=>{
+      const title = document.getElementById('nlTitle').value || 'آپارتمان مدرن';
+      const area = document.getElementById('nlArea').value || 'منطقه مرکزی';
+      const meter = document.getElementById('nlMeter').value || '۱۰۰';
+      const price = document.getElementById('nlPrice').value;
+      const room = document.getElementById('nlRoom').value || '۲';
+      const year = document.getElementById('nlYear').value || '۱۴۰۰';
+      const priceTxt = price ? (Math.round(price/1e9*10)/10) + ' میلیارد تومان' : 'توافقی';
+      document.getElementById('nlTitle').value = title === 'آپارتمان مدرن' ? (meter+' متری '+area) : title;
+      document.getElementById('genTitle').textContent = document.getElementById('nlTitle').value;
+      document.getElementById('genDesc').textContent =
+        'واحد '+meter+' متری واقع در '+area+'، ساخت سال '+year+'، با '+room+' اتاق خواب. '+
+        'این ملک با نورگیری مناسب، دسترسی آسان و امکانات کامل، گزینه‌ای مناسب برای خانواده‌ها یا سرمایه‌گذاری محسوب می‌شود. قیمت پیشنهادی: '+priceTxt+'.';
+      document.getElementById('assistantOut').classList.add('show');
+      document.getElementById('assistantOut').scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 1100);
+  }
+
+  // ---------- photo upload + AI teaser generator ----------
+  function handlePhotos(input, previewId){
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = '';
+    delete preview.dataset.cover;
+    Array.from(input.files).slice(0,6).forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const div = document.createElement('div');
+        div.className = 'photo-thumb';
+        div.style.backgroundImage = `url(${e.target.result})`;
+        preview.appendChild(div);
+        if(!preview.dataset.cover) preview.dataset.cover = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  function runTeaser(previewId, outId, cardId){
+    const btn = event.target.closest('button');
+    const preview = document.getElementById(previewId);
+    const cover = preview.dataset.cover;
+    const count = preview.children.length || 3;
+    withLoading(btn, ()=>{
+      const out = document.getElementById(outId);
+      out.classList.add('show');
+      const card = document.getElementById(cardId);
+      card.innerHTML = `<div class="teaser-preview" style="${cover ? 'background-image:url('+cover+')' : ''}">
+          <span class="teaser-label">پیش‌نمایش تیزر</span>
+          <div class="teaser-play"><svg width="20" height="20" viewBox="0 0 24 24" fill="#095F5E"><path d="M8 5v14l11-7z"/></svg></div>
+          <span class="teaser-dur">۰۰:۲۴</span>
+        </div>
+        <p style="font-size:.8rem;color:var(--ink-soft);margin-top:10px;line-height:1.85;">✨ تیزر ۲۴ ثانیه‌ای با ترانزیشن نرم بین ${count} عکس ملک آماده شد — قابل اشتراک‌گذاری در استوری و شبکه‌های اجتماعی.</p>`;
+      out.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 1400);
+  }
+  // ---------- virtual property tour preview ----------
+  const TOUR_DATA = {
+    property: { cover:'https://picsum.photos/seed/vira-kianpars-cover/1000/700', dur:'۰۰:۵۲', name:'آپارتمان کیانپارس' },
+    propertyowner: { cover:'https://picsum.photos/seed/vira-owner-cover/1000/700', dur:'۰۰:۳۸', name:'آپارتمان کوی ملت' }
+  };
+  function showVirtualTour(key){
+    const btn = event.target.closest('button');
+    const data = TOUR_DATA[key];
+    withLoading(btn, ()=>{
+      const out = document.getElementById('tourOut-'+key);
+      const card = document.getElementById('tourCard-'+key);
+      out.classList.add('show');
+      card.innerHTML = `<div class="teaser-preview" style="background-image:url(${data.cover})">
+          <span class="teaser-label">بازدید مجازی</span>
+          <div class="teaser-play"><svg width="22" height="22" viewBox="0 0 24 24" fill="#095F5E"><path d="M8 5v14l11-7z"/></svg></div>
+          <span class="teaser-dur">${data.dur}</span>
+        </div>
+        <p style="font-size:.8rem;color:var(--ink-soft);margin-top:10px;line-height:1.85;">🎥 ویدیوی بازدید مجازی ${data.name} آماده‌ست — یه تور سریع از فضای داخلی و ورودی ملک، بدون نیاز به حضور فیزیکی.</p>`;
+      out.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 1200);
+  }
+
+  const CHAT_PERSONAS = {
+    mohammadi: { name:'آقای محمدی', role:'مشاور این ملک', avatar:53,
+      greet:'سلام! در خدمتم، درباره آپارتمان کیانپارس سوالی دارید؟',
+      reply:'سلام ممنونم از پیامی که دادید\nواسه این ملک می‌تونم روز دوشنبه ساعت ۸ شب بازدید رو هماهنگ کنم' },
+    karimi: { name:'آقای کریمی', role:'مالک ملک (بدون واسطه)', avatar:12,
+      greet:'سلام! من مالک این واحدم، خوشحال می‌شم راهنماییتون کنم.',
+      reply:'سلام، ممنون از پیامتون!\nهر روز عصر برای بازدید حضوری در دسترسم، فقط بگید کدوم روز راحتید تا هماهنگ کنیم.' }
+  };
+  let currentChatPersona = 'mohammadi';
+  let chatReturnPage = 'property';
+  function openAgentChat(key, returnPage){
+    currentChatPersona = key || 'mohammadi';
+    chatReturnPage = returnPage || 'property';
+    const p = CHAT_PERSONAS[currentChatPersona];
+    document.getElementById('chatAvatar').style.backgroundImage = `url(https://i.pravatar.cc/100?img=${p.avatar})`;
+    document.getElementById('chatName').textContent = p.name;
+    document.getElementById('chatStatus').textContent = 'آنلاین · ' + p.role;
+    const thread = document.getElementById('chatThread');
+    thread.innerHTML = '';
+    thread.appendChild(chatBubble(p.greet, false));
+    showPage('agentchat');
+  }
+  function chatBubble(text, fromMe){
+    const wrap = document.createElement('div');
+    wrap.style.alignSelf = fromMe ? 'flex-end' : 'flex-start';
+    wrap.style.maxWidth = '78%';
+    const bubble = document.createElement('div');
+    bubble.style.borderRadius = fromMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
+    bubble.style.padding = '11px 15px';
+    bubble.style.fontSize = '.85rem';
+    bubble.style.lineHeight = '1.8';
+    bubble.style.whiteSpace = 'pre-line';
+    bubble.style.background = fromMe ? 'var(--turquoise)' : 'var(--bg-alt)';
+    bubble.style.color = fromMe ? '#fff' : 'var(--ink)';
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+    return wrap;
+  }
+  function sendChat(){
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if(!text) return;
+    const thread = document.getElementById('chatThread');
+    thread.appendChild(chatBubble(text, true));
+    input.value = '';
+    thread.scrollTop = thread.scrollHeight;
+    setTimeout(()=>{
+      const typing = chatBubble('...', false);
+      typing.id = 'chatTyping';
+      thread.appendChild(typing);
+      thread.scrollTop = thread.scrollHeight;
+      setTimeout(()=>{
+        document.getElementById('chatTyping').remove();
+        thread.appendChild(chatBubble(CHAT_PERSONAS[currentChatPersona].reply, false));
+        thread.scrollTop = thread.scrollHeight;
+      }, 900);
+    }, 300);
+  }
+
+  // ---------- smart search agent ----------
+  function toggleSmartSearch(){
+    document.getElementById('smartPanel').classList.toggle('show');
+    document.getElementById('smartPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  function runSmartSearch(){
+    withLoading(event.target.closest('button'), ()=>{
+      document.getElementById('smartAnswer').classList.add('show');
+      document.getElementById('smartAnswer').scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 1100);
+  }
+  function showMehrshahrOptions(){
+    const box = document.getElementById('mehrshahrResults');
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  // ---------- individual owner listing ----------
+  let listType = 'sale';
+  function toggleListType(t){
+    listType = t;
+    document.getElementById('segSale').classList.toggle('active', t==='sale');
+    document.getElementById('segRent').classList.toggle('active', t==='rent');
+    document.getElementById('ilSaleWrap').style.display = t==='sale' ? '' : 'none';
+    document.getElementById('ilDepositWrap').style.display = t==='rent' ? '' : 'none';
+    document.getElementById('ilRentWrap').style.display = t==='rent' ? '' : 'none';
+  }
+  function runIndAssistant(){
+    const btn = event.target.closest('button');
+    withLoading(btn, ()=>{
+      const title = document.getElementById('ilTitle').value;
+      const area = document.getElementById('ilArea').value || 'منطقه مورد نظر';
+      const meter = document.getElementById('ilMeter').value || '۱۰۰';
+      const room = document.getElementById('ilRoom').value || '۲';
+      const extra = document.getElementById('ilDesc').value;
+      let priceTxt, advice;
+      if(listType === 'sale'){
+        const price = document.getElementById('ilPrice').value;
+        priceTxt = price ? (Math.round(price/1e9*10)/10) + ' میلیارد تومان' : 'توافقی';
+        advice = '💡 <b>مشاوره فروش:</b> با توجه به متراژ و منطقه وارد شده، قیمت پیشنهادی شما در بازه معقول بازار قرار دارد. برای فروش سریع‌تر، ثبت حداقل ۵ عکس با نور روز و درج دقیق سال ساخت توصیه می‌شود.';
+      } else {
+        const dep = document.getElementById('ilDeposit').value;
+        const rent = document.getElementById('ilRent').value;
+        const depTxt = dep ? faNum(dep)+' تومان' : 'توافقی';
+        const rentTxt = rent ? faNum(rent)+' تومان' : 'توافقی';
+        priceTxt = 'ودیعه '+depTxt+' + اجاره ماهانه '+rentTxt;
+        advice = '💡 <b>مشاوره رهن و اجاره:</b> نسبت ودیعه به اجاره وارد شده با میانگین بازار همخوانی دارد. اگر مستأجر تمایل به افزایش ودیعه در برابر کاهش اجاره داشت، از ابزار «تبدیل رهن و اجاره» در بخش ابزارهای کاربردی برای محاسبه دقیق استفاده کنید.';
+      }
+      document.getElementById('ilTitle').value = title || (meter+' متری '+area);
+      document.getElementById('ilGenTitle').textContent = document.getElementById('ilTitle').value;
+      document.getElementById('ilGenDesc').textContent =
+        'واحد '+meter+' متری واقع در '+area+' با '+room+' اتاق خواب، آماده '+(listType==='sale'?'فروش':'رهن و اجاره')+'. '+
+        (extra ? extra+'. ' : '') +
+        'ملکی مناسب برای زندگی یا سرمایه‌گذاری با دسترسی مناسب به امکانات منطقه. ' + (listType==='sale' ? 'قیمت: ' : '') + priceTxt + '.';
+      document.getElementById('ilAdvice').innerHTML = advice;
+      document.getElementById('ilAssistantOut').classList.add('show');
+      document.getElementById('ilAssistantOut').scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 1100);
+  }
+
+  // ---------- analytics Q&A ----------
+  let mehrshahrBuilt = false;
+  function runAnalyticsQ(){
+    const btn = event.target.closest('button');
+    withLoading(btn, ()=>{
+      document.getElementById('analyticsAnswer').classList.add('show');
+      document.getElementById('analyticsAnswer').scrollIntoView({behavior:'smooth', block:'nearest'});
+      if(!mehrshahrBuilt){
+        mehrshahrBuilt = true;
+        svgLineChart('mehrshahrChart', ['۱۴۰۰','۱۴۰۱','۱۴۰۲','۱۴۰۳','۱۴۰۴','۱۴۰۵'],
+          [100,118,132,151,176,205], {color:cssVar('--success'), fill:cssVar('--success-tint')});
+      }
+    }, 1000);
+  }
+
+  // ---------- AI agent modal ----------
+  const AGENTS = {
+    avak:   { name:'آواک',   role:'یادآور هوشمند وظایف',      greet:'سلام! من آواک هستم. کارهای امروزت رو مدیریت می‌کنم و یادم نمی‌ذاره چیزی رو فراموش کنی!', chips:['📊 گزارش هفتگی','➕ یادآوری جدید','☕ جلسات','📱 کارهای امروز'], emoji:'👼', grad:['#ec4899','#a855f7'], reply:'باشه! یادآوری‌های امروزت رو بررسی کردم — ۲ جلسه و ۳ تماس پیگیری داری. می‌خوای اولویت‌بندیشون کنم؟' },
+    zarkan: { name:'زرکان',  role:'متخصص مذاکره و فروش',      greet:'سلام! من زرکان هستم. در مذاکره و متقاعدسازی مشتریان کمکت می‌کنم.', chips:['🛡 مدیریت اعتراض','🤝 بستن قرارداد','💬 متقاعدسازی','🎯 تکنیک مذاکره'], emoji:'🦊', grad:['#f97316','#dc2626'], reply:'برای این مشتری پیشنهاد می‌کنم روی مزیت رقابتی ملک (موقعیت و متراژ) تمرکز کنی، نه فقط قیمت. می‌خوای یک اسکریپت مذاکره آماده کنم؟' },
+    kavin:  { name:'کاوین',  role:'تحلیلگر هوشمند بازار',     greet:'سلام! من کاوین هستم. تحلیل بازار مسکن و پیش‌بینی روندها تخصص منه.', chips:['📊 گزارش بازار','🏙 مقایسه مناطق','📈 پیش‌بینی قیمت','📍 تحلیل منطقه'], emoji:'🐉', grad:['#fb923c','#ea580c'], reply:'بر اساس آخرین داده‌ها، منطقه ۲۲ همچنان بالاترین رشد قیمت رو داره. می‌خوای تحلیل کامل این منطقه رو برات باز کنم؟' },
+    yarin:  { name:'یارین',  role:'مدیریت هوشمند مشتری',      greet:'سلام! من یارین هستم. در مدیریت مشتریان و پیگیری‌ها کمکت می‌کنم.', chips:['📊 گزارش عملکرد','✉️ پیام خودکار','🏷 دسته‌بندی مشتریان','📋 پیگیری مشتری'], emoji:'🐰', grad:['#14b8a6','#0d9488'], reply:'۳ مشتری داری که بیش از ۵ روزه پیگیری نشدن. می‌خوای براشون پیام یادآوری خودکار بفرستم؟' },
+    raymon: { name:'رایمون', role:'مشاور هوشمند فروش',        greet:'سلام! من رایمون هستم. چطور می‌تونم در فروش ملک بهت کمک کنم؟', chips:['🎬 تبلیغات مؤثر','🏠 نحوه ارائه ملک','🎯 استراتژی فروش','💰 قیمت‌گذاری ملک'], emoji:'🐲', grad:['#8b5cf6','#6366f1'], reply:'برای این آگهی پیشنهاد می‌کنم عکس‌های بیشتری از نور روز اضافه کنی — آگهی‌هایی با نور طبیعی ۳۰٪ بازدید بیشتری می‌گیرن.' }
+  };
+  function openAgent(key){
+    const a = AGENTS[key];
+    document.getElementById('agentHeader').style.background = 'linear-gradient(120deg,'+a.grad[0]+','+a.grad[1]+')';
+    document.getElementById('agentAvatar').textContent = a.emoji;
+    document.getElementById('agentName').textContent = a.name+' - '+a.role;
+    document.getElementById('agentRole').textContent = 'دستیار هوشمند شما';
+    document.getElementById('agentGreet').textContent = a.greet;
+    const chipsWrap = document.getElementById('agentChips');
+    chipsWrap.innerHTML = '';
+    a.chips.forEach(c=>{
+      const b = document.createElement('button');
+      b.className = 'tag-chip'; b.textContent = c;
+      b.onclick = ()=>{ document.getElementById('agentInput').value = c.replace(/^\S+\s/,''); };
+      chipsWrap.appendChild(b);
+    });
+    document.getElementById('agentInput').value = '';
+    const reply = document.getElementById('agentReply');
+    reply.classList.remove('show'); reply.textContent='';
+    document.getElementById('agentModal').dataset.key = key;
+    document.getElementById('agentModal').classList.add('show');
+  }
+  function closeAgent(){ document.getElementById('agentModal').classList.remove('show'); }
+  function sendAgent(){
+    const key = document.getElementById('agentModal').dataset.key;
+    const a = AGENTS[key];
+    const reply = document.getElementById('agentReply');
+    reply.classList.add('show');
+    reply.innerHTML = 'در حال بررسی <span class="loading-dots"><span></span><span></span><span></span></span>';
+    setTimeout(()=>{ reply.textContent = a.reply; }, 800);
+  }
+
+  // ---------- dependency-free SVG chart engine (no external library, works fully offline) ----------
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  const SVG_W = 440, SVG_H = 220, SVG_PAD = 28;
+
+  function svgLineChart(divId, labels, values, opts={}){
+    const el = document.getElementById(divId);
+    if(!el) return;
+    const max = opts.max ?? Math.max(...values);
+    const min = opts.min ?? Math.min(0, Math.min(...values));
+    const range = (max - min) || 1;
+    const innerW = SVG_W - SVG_PAD*2, innerH = SVG_H - SVG_PAD*2 - 16;
+    const stepX = values.length > 1 ? innerW / (values.length - 1) : 0;
+    const pts = values.map((v,i)=>{
+      const x = SVG_PAD + i*stepX;
+      const y = SVG_PAD + innerH - ((v - min)/range)*innerH;
+      return [x,y];
+    });
+    const line = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+    const area = line+' L'+pts[pts.length-1][0].toFixed(1)+','+(SVG_PAD+innerH)+' L'+pts[0][0].toFixed(1)+','+(SVG_PAD+innerH)+' Z';
+    const color = opts.color || cssVar('--turquoise');
+    const fill = opts.fill || cssVar('--turquoise-tint');
+    const dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="${color}"/>`).join('');
+    const showEvery = opts.skipLabels ? Math.ceil(labels.length/6) : 1;
+    const labelEls = labels.map((l,i)=> (i % showEvery === 0) ? `<text x="${pts[i][0].toFixed(1)}" y="${SVG_H-6}" font-size="9" text-anchor="middle" fill="${cssVar('--ink-faint')}">${l}</text>` : '').join('');
+    el.innerHTML = `<svg viewBox="0 0 ${SVG_W} ${SVG_H}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+      <path d="${area}" fill="${fill}" stroke="none"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5"/>
+      ${dots}${labelEls}
+    </svg>`;
+  }
+
+  function svgBarChart(divId, labels, series, opts={}){
+    const el = document.getElementById(divId);
+    if(!el) return;
+    const allVals = series.flatMap(s=>s.data);
+    const max = opts.max ?? Math.max(...allVals) * 1.15;
+    const innerW = SVG_W - SVG_PAD*2, innerH = SVG_H - SVG_PAD*2 - 16;
+    const n = labels.length, groupW = innerW/n, barGap = 4;
+    const barW = (groupW - barGap*(series.length+1)) / series.length;
+    let bars = '';
+    labels.forEach((l,i)=>{
+      const gx = SVG_PAD + i*groupW;
+      series.forEach((s,si)=>{
+        const v = s.data[i];
+        const h = (v/max)*innerH;
+        const x = gx + barGap + si*(barW+barGap);
+        const y = SVG_PAD + innerH - h;
+        bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${s.color}"/>`;
+      });
+      bars += `<text x="${(gx+groupW/2).toFixed(1)}" y="${SVG_H-6}" font-size="9" text-anchor="middle" fill="${cssVar('--ink-faint')}">${l}</text>`;
+    });
+    const legend = series.length>1 ? `<div style="display:flex;gap:14px;justify-content:center;margin-top:4px;flex-wrap:wrap">${series.map(s=>`<span style="font-size:.72rem;color:${cssVar('--ink-soft')}"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${s.color};margin-inline-end:5px;"></span>${s.label}</span>`).join('')}</div>` : '';
+    el.innerHTML = `<svg viewBox="0 0 ${SVG_W} ${SVG_H}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${bars}</svg>${legend}`;
+  }
+
+  function svgDonut(divId, data){
+    const el = document.getElementById(divId);
+    if(!el) return;
+    const total = data.reduce((a,d)=>a+d.value,0);
+    const cx=110, cy=100, r=80, rInner=50;
+    let angle = -Math.PI/2, paths = '';
+    data.forEach(d=>{
+      const frac = d.value/total, sweep = frac*Math.PI*2;
+      const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
+      const x2=cx+r*Math.cos(angle+sweep), y2=cy+r*Math.sin(angle+sweep);
+      const xi1=cx+rInner*Math.cos(angle+sweep), yi1=cy+rInner*Math.sin(angle+sweep);
+      const xi2=cx+rInner*Math.cos(angle), yi2=cy+rInner*Math.sin(angle);
+      const large = sweep > Math.PI ? 1 : 0;
+      paths += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${xi1.toFixed(1)},${yi1.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${xi2.toFixed(1)},${yi2.toFixed(1)} Z" fill="${d.color}"/>`;
+      angle += sweep;
+    });
+    const legend = `<div style="display:flex;flex-direction:column;gap:8px;justify-content:center">${data.map(d=>`<span style="font-size:.78rem;color:${cssVar('--ink-soft')}"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${d.color};margin-inline-end:6px;"></span>${d.label} — ${d.value}٪</span>`).join('')}</div>`;
+    el.style.display='flex'; el.style.alignItems='center'; el.style.gap='18px'; el.style.justifyContent='center';
+    el.innerHTML = `<svg viewBox="0 0 220 200" width="150" height="140">${paths}</svg>${legend}`;
+  }
+
+  let analyticsBuilt = false;
+  function buildAnalyticsCharts(){
+    if(analyticsBuilt) return; analyticsBuilt = true;
+    svgBarChart('compareChart', ['منطقه ۲۲','منطقه ۵','منطقه ۴','منطقه ۱','منطقه ۲','منطقه ۳'], [
+      {label:'رشد یک ساله (٪)', data:[32,25,17,13,20,24], color:cssVar('--turquoise')},
+      {label:'پیش‌بینی ۶ ماه آینده (٪)', data:[16,11,8,7,10,12], color:cssVar('--brick')}
+    ]);
+    svgBarChart('volumeChart', ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور'], [
+      {label:'حجم معاملات', data:[130,160,182,205,228,252], color:cssVar('--gold')}
+    ]);
+    svgLineChart('priceChart', ['۶ ماه پیش','۵ ماه پیش','۴ ماه پیش','۳ ماه پیش','۲ ماه پیش','۱ ماه پیش'],
+      [58,60,62,65,68,72], {color:cssVar('--success'), fill:cssVar('--success-tint')});
+  }
+</script>
+</body>
+</html>
